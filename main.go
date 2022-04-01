@@ -14,12 +14,21 @@ type shopItem struct {
 func main() {
 	//insert code here
 	// create map reference with dynamic size allocation
-	categoryMap := map[int]string{
+	/*
+		categoryMap := map[int]string{
+			// initialise map
+			0: "Undefined",
+			1: "Household",
+			2: "Food",
+			3: "Drinks",
+		}
+	*/
+	categorySlice := []string{
 		// initialise map
-		0: "Undefined",
-		1: "Household",
-		2: "Food",
-		3: "Drinks",
+		"Undefined",
+		"Household",
+		"Food",
+		"Drinks",
 	}
 
 	// create map reference
@@ -62,23 +71,21 @@ func main() {
 
 		switch choice {
 		case 1:
-			viewShoppingList(shopListMap, categoryMap)
+			viewShoppingList(shopListMap, categorySlice)
 		case 2:
-			genShoppingReport(shopListMap, categoryMap)
+			genShoppingReport(shopListMap, categorySlice)
 		case 3:
-			addItem(shopListMap, categoryMap)
+			addItem(shopListMap, categorySlice)
 		case 4:
-			modifyItem(shopListMap, categoryMap)
+			modifyItem(shopListMap, categorySlice)
 		case 5:
 			deleteItem(shopListMap)
 		case 6:
-			printCurrentField(shopListMap, categoryMap)
+			printCurrentField(shopListMap)
 		case 7:
-			addNewCategory(categoryMap)
+			addNewCategory(categorySlice)
 		case 8:
-			fmt.Println("Category Map")
-			fmt.Println(categoryMap)
-			fmt.Println(len(categoryMap))
+			showCategory(categorySlice)
 		case 0:
 			// break only work for switch but not applied to for loop
 		default:
