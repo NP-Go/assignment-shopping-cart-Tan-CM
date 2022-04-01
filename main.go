@@ -48,7 +48,7 @@ func main() {
 		"5.  Delete Item.",
 		"6.  Print Current Data",
 		"7.  Add New Category Name.",
-		"8.  Test",
+		"8.  For Test",
 		"Select your choice:",
 	}
 
@@ -84,23 +84,6 @@ func main() {
 			fmt.Println("Wrong Entry")
 		}
 	}
-}
-
-// View Shopping List
-func viewShoppingList(shopListMap map[string]shopItem, categoryMap map[int]string) {
-	// show all shopping items category, item , qty and unit price
-	// Get all key of a map of struct
-	keys := make([]string, 0, len(shopListMap))
-	for k, _ := range shopListMap {
-		keys = append(keys, k)
-	}
-	//	fmt.Println(keys)
-
-	for _, shopItem := range keys {
-		fmt.Printf("Category: %s - Item: %s Quantity: %d Unit Cost: %.0f\n",
-			shopItem, categoryMap[shopListMap[shopItem].category], shopListMap[shopItem].qty, shopListMap[shopItem].cost)
-	}
-
 }
 
 func genShoppingReport(shopListMap map[string]shopItem, categoryMap map[int]string) {
