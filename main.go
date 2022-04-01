@@ -46,7 +46,8 @@ func main() {
 		"5.  Delete Item.",
 		"6.  Print Current Data",
 		"7.  Add New Category Name.",
-		"8.  For Test",
+		"8.  For Testing Only",
+		"0.  To Exit",
 		"Select your choice:",
 	}
 
@@ -78,8 +79,13 @@ func main() {
 			fmt.Println("Category Map")
 			fmt.Println(categoryMap)
 			fmt.Println(len(categoryMap))
+		case 0:
+			// break only work for switch but not applied to for loop
 		default:
 			fmt.Println("Wrong Entry")
+		}
+		if choice == 0 {
+			break // use break here to break the loop
 		}
 	}
 }
