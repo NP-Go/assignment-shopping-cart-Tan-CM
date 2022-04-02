@@ -256,6 +256,7 @@ func deleteItem(shopListMap map[string]shopItem) {
 func printCurrentField(shopListMap map[string]shopItem) {
 	// key all keys in the shopList Map in a slice
 	keys := getAllKeys(shopListMap)
+
 	//	fmt.Println(keys)
 
 	fmt.Println("Print Current Data.")
