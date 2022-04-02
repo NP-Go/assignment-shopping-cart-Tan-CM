@@ -16,15 +16,17 @@ import (
 // ****************************************
 // Key Lessons Learnt about Go lang exercise
 // All functions are passed by value.  It is the content of the value that determine what is the content
-//	1.  Slice are passed to functions by value (which is the pointer of the array)  Slice is made up of array
-//      This means that if the slice is to be changed like modify the element in the slice, the pointer to the slice is needed
-//      for change to the actual category to happen.  See addNewOrModifyCategory(&categorySlice) and deleteCategory(shopListMap, &categorySlice)
-//  2.  Map is passed to function by value (which is the pointer to the key)
+//	1.  Slice are passed to functions by reference (which is the pointer of the array)  Slice is made up of array
+//      This means that if the slice is changed like changing the size in the slice (eg append()), the new slice reference is created.
+//      In such case a pointer to slice type is needed, so that pointer type can store the new reference
+//      See addNewOrModifyCategory(&categorySlice) and deleteCategory(shopListMap, &categorySlice)
+//  2.  Map and Slice are passed to function by reference
 //      if the key is new, a new key-value pair can be created with m[k] = item
 //		However, the key-value pair , if the key to the value already exist, it has first to be delete before a new key-value is recreated
 //      delete(m, k)
 //		m[k] = item
 //      Note that Map value cannot be changed, so if the same key is needed for a different value, it has to be re-created after deletion
+//      While Map reference does not change and adding or removing keys, thus pointer is not needed for Map, when the Map needs to be modified
 //	3.  ... means variadic or multiple arguments, which can only be the last parameter of a function if there are several parameters
 //		eg append((*categorySlice)[:i], (*categorySlice)[i+1:]...)  where the ... means it is a slice (variable length array)
 //  4.  for k, v := range map type    ==> k = key, v = value for map
