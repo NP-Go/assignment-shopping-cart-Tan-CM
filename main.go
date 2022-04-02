@@ -4,6 +4,40 @@ import (
 	"fmt"
 )
 
+// *****************************************
+// 2 Apr 2022
+// Tan Chor Ming
+// Record of Time on this stupid Go Basic assignment
+// Wed, 5
+// Thurs 12
+// Fri 8
+// Sat 3
+// Total 28 hours
+// ****************************************
+// Key Lessons Learnt about Go lang exercise
+// All functions are passed by value.  It is the content of the value that determine what is the content
+//	1.  Slice are passed to functions by value (which is the pointer of the array)  Slice is made up of array
+//      This means that if the slice is to be changed like modify the element in the slice, the pointer to the slice is needed
+//      for change to the actual category to happen.  See addNewOrModifyCategory(&categorySlice) and deleteCategory(shopListMap, &categorySlice)
+//  2.  Map is passed to function by value (which is the pointer to the key)
+//      if the key is new, a new key-value pair can be created with m[k] = item
+//		However, the key-value pair , if the key to the value already exist, it has first to be delete before a new key-value is recreated
+//      delete(m, k)
+//		m[k] = item
+//      Note that Map value cannot be changed, so if the same key is needed for a different value, it has to be re-created after deletion
+//	3.  ... means variadic or multiple arguments, which can only be the last parameter of a function if there are several parameters
+//		eg append((*categorySlice)[:i], (*categorySlice)[i+1:]...)  where the ... means it is a slice (variable length array)
+//  4.  for k, v := range map type    ==> k = key, v = value for map
+//          i, e := range slice type  ==> i = index, e = element for both slice or array
+//  5.  append  -- overloaded built-in function, use to build slice of elements of variable size
+//      for slice --> slices = append (slice,e)
+//
+//*****************************************
+// What can be improved for this course?
+// Development Consideration should be in page 1 instead of the last page
+// I wasted so much time, because this consideration is so important for novice like me.
+//*****************************************
+
 // define structure for item
 type shopItem struct {
 	category int
@@ -14,15 +48,7 @@ type shopItem struct {
 func main() {
 	//insert code here
 	// create map reference with dynamic size allocation
-	/*
-		categoryMap := map[int]string{
-			// initialise map
-			0: "Undefined",
-			1: "Household",
-			2: "Food",
-			3: "Drinks",
-		}
-	*/
+
 	categorySlice := []string{
 		// initialise map
 		"Undefined",
@@ -54,9 +80,10 @@ func main() {
 		"4.  Modify Items.",
 		"5.  Delete Item.",
 		"6.  Print Current Data",
-		"7.  Add New Category Name.",
-		"8.  For Testing Only",
-		"0.  To Exit",
+		"7.  Add New or Modify Category Name",
+		"8.  View Category",
+		"9.  Delete Category",
+		"x.  To Exit",
 		"Select your choice:",
 	}
 
@@ -65,33 +92,35 @@ func main() {
 			fmt.Println(item)
 		}
 
-		var choice int
+		var choice string
 		fmt.Scanln(&choice)
 		//	fmt.Println(strconv.Itoa(choice))
 
 		switch choice {
-		case 1:
+		case "1":
 			viewShoppingList(shopListMap, categorySlice)
-		case 2:
+		case "2":
 			genShoppingReport(shopListMap, categorySlice)
-		case 3:
+		case "3":
 			addItem(shopListMap, categorySlice)
-		case 4:
+		case "4":
 			modifyItem(shopListMap, categorySlice)
-		case 5:
+		case "5":
 			deleteItem(shopListMap)
-		case 6:
+		case "6":
 			printCurrentField(shopListMap)
-		case 7:
-			addNewCategory(categorySlice)
-		case 8:
+		case "7":
+			addNewOrModifyCategory(&categorySlice)
+		case "8":
 			showCategory(categorySlice)
-		case 0:
+		case "9":
+			deleteCategory(shopListMap, &categorySlice)
+		case "x":
 			// break only work for switch but not applied to for loop
 		default:
 			fmt.Println("Wrong Entry")
 		}
-		if choice == 0 {
+		if choice == "x" {
 			break // use break here to break the loop
 		}
 	}

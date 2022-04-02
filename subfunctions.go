@@ -142,9 +142,7 @@ func addItem(shopListMap map[string]shopItem, categorySlice []string) {
 
 func modifyItem(shopListMap map[string]shopItem, categorySlice []string) {
 	var item1, item2 shopItem
-	//	var shop_list []shopItem
 	var name, nameNew string
-	//	var x int
 	var category string
 
 	fmt.Println("Modify Items")
@@ -189,7 +187,7 @@ func modifyItem(shopListMap map[string]shopItem, categorySlice []string) {
 				fmt.Scanln(&item1.qty)
 				fmt.Println("Enter New Unit Cost, Enter for no change?")
 				fmt.Scanln(&item1.cost)
-				// update item to shopList slice
+				// update item to shopList map
 				if name != nameNew {
 					delete(shopListMap, name)    // remove old key
 					shopListMap[nameNew] = item1 // create new key
@@ -267,46 +265,100 @@ func printCurrentField(shopListMap map[string]shopItem) {
 	}
 }
 
-// Note slice is passed by reference and not by value
-func addNewCategory(categorySlice []string) {
+// slice is passed by value which is the pointer to the array
+// Need to pass the pointer to the slice itself if modification to the slice is needed
+func addNewOrModifyCategory(categorySlice *[]string) {
 	var newCategory string
 
 	//	fmt.Println(len(categoryMap), categoryMap)
-	fmt.Println("Add New Category Name")
+	fmt.Println("Add New or Modify Category Name")
 	fmt.Println("What is the New Category Name to add?")
 	fmt.Scanln(&newCategory)
 	if (strings.TrimSpace(newCategory)) != "" {
 		//		fmt.Printf("Length of Map = %d\n", len(categoryMap))
 
-		for i := 1; i <= len(categorySlice); i++ {
-			if i == len(categorySlice) {
-				fmt.Printf("New Category: %s added at index %d\n", newCategory, i)
-				//				fmt.Println("Len: " + strconv.Itoa(len(categorySlice)) + " Cap: " + strconv.Itoa(cap(categorySlice)))
-				categorySlice = append(categorySlice, newCategory)
-				//				fmt.Println("Len: " + strconv.Itoa(len(categorySlice)) + " Cap: " + strconv.Itoa(cap(categorySlice)))
-				break
-			} else {
-				if newCategory == categorySlice[i] {
-					fmt.Printf("Category: %s already exist at index %d !\n", newCategory, i)
-					// break for loop if found
-					break
+		i := sliceIndex(*categorySlice, newCategory)
+		if i == -1 {
+			//	New category added to last slice
+			*categorySlice = append(*categorySlice, newCategory)
+			fmt.Printf("New Category: %s added at index %d\n", newCategory, len(*categorySlice)-1)
+		} else {
+			if i > 0 {
+				fmt.Printf("Category: %s already exist at index %d !\n", newCategory, i)
+				fmt.Println("Enter New Name to modify the category name or Press return to ignore")
+				// Get new name for existing category
+				fmt.Scanln(&newCategory)
+				if (strings.TrimSpace(newCategory)) != "" {
+					// Note the () is needed to get the dereferencing
+					(*categorySlice)[i] = newCategory
 				} else {
-					// Category Not found, continue to scan category Map or Slice, not needed
+					// Exit and nothing with whitespaces
+					// no change to category name
 				}
+
+			} else {
+				// Category for undefine category
+				fmt.Print("Undefined Category Found")
 			}
 		}
 	} else {
 		fmt.Println("No Input Found!")
 	}
-	fmt.Println(categorySlice)
+	//	fmt.Println(*categorySlice)
 }
 
 // show category for debug use only
 func showCategory(categorySlice []string) {
 
-	fmt.Println("Category Slice")
+	fmt.Println("Show Category")
 	fmt.Println(categorySlice)
 	fmt.Println(len(categorySlice))
+}
+
+func deleteCategory(shopListMap map[string]shopItem, categorySlice *[]string) {
+	var newCategory string
+	// Note when category is deleted
+	// Problem with this operation
+	// 1.  How to handle the shopping List which has the category to be deleted?
+	// 2.  The association of the shopping list will need to be reassociated because of deletion of a category
+	// Solution:
+	// 1.  Disallow delete if any shopping list has this category in use
+	// 2.  Re-associate the affect shopping list for category affected by the deletion
+
+	//	fmt.Println(len(categoryMap), categoryMap)
+	fmt.Println("Delete Category Name")
+	fmt.Println("What is the Category Name to delete?")
+	fmt.Scanln(&newCategory)
+	if (strings.TrimSpace(newCategory)) != "" {
+
+		i := sliceIndex(*categorySlice, newCategory)
+		if i == -1 {
+			fmt.Printf("Category: %s cannot be found\n", newCategory)
+
+		} else {
+			if i > 0 {
+				// Step 1.  Before delete is done, need to check if the category is used in shopping list
+				// if it is, deletion is disallowed
+				if map_category_present(shopListMap, i) == false {
+					// This approach maintains the original order of the slice with one element removed
+					// Note ... variadic argument because the it is variable length element to unpack
+					*categorySlice = append((*categorySlice)[:i], (*categorySlice)[i+1:]...)
+					fmt.Printf("Category: %s delete\n", newCategory)
+					// Step 2.  If deletion is category i is removed, shoplist cat index has to be adjusted
+					// All category > i is reduced by 1 for every item is shopping list
+					shiftDownCategoryBy1(shopListMap, i)
+				} else {
+					fmt.Println("Category in used, cannot be deleted")
+				}
+			} else {
+				// Category for undefine category
+				fmt.Print("Undefined Category Found")
+			}
+		}
+	} else {
+		fmt.Println("No Input Found!")
+	}
+	fmt.Println(*categorySlice)
 }
 
 // return the index given the name of the category
@@ -322,9 +374,41 @@ func sliceIndex(s []string, strToFind string) int {
 }
 
 // check if map has this key
+// retrun true if there is
 func map_key_present(m map[string]shopItem, k string) (ok bool) {
 	_, ok = m[k]
 	return
+}
+
+// check if map has this category in the object
+// return true is category is present
+func map_category_present(m map[string]shopItem, k int) (ok bool) {
+	// add cost of respective category
+	for _, item := range m {
+		if (item.category) == k {
+			ok = true
+			break
+		}
+	}
+	return
+}
+
+// operation on category
+// For all shoplist item with category > categoryKey, category = category -1
+// Note:  Map value cannot be changed directly, it can only be re-created
+func shiftDownCategoryBy1(m map[string]shopItem, categoryKey int) {
+	// add cost of respective category1
+
+	for k, item := range m {
+		if (item.category) > categoryKey {
+			// delete affect entry of affected key
+			delete(m, k)
+			// modify the category of the item
+			item.category = item.category - 1
+			// create a new item with the same key
+			m[k] = item
+		}
+	}
 }
 
 // check if category slice has this value
