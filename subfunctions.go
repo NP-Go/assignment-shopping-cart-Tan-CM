@@ -8,23 +8,24 @@ import (
 
 // This file has the sub functions
 // View Shopping List
-func viewShoppingList(shopListMap map[string]shopItem, categorySlice []string) {
+// func viewShoppingList(shopListMap map[string]shopItem, categorySlice []string) {
+func viewShoppingList(shopList listMap, categorySlice []string) {
 	// show all shopping items category, item , qty and unit price
 	// Get all the keys of a map of struct
-	keys := make([]string, 0, len(shopListMap))
-	for k, _ := range shopListMap {
+	keys := make([]string, 0, len(shopList))
+	for k, _ := range shopList {
 		keys = append(keys, k)
 	}
 	//	fmt.Println(keys)
 
 	for _, nameItem := range keys {
 		fmt.Printf("Category: %s - Item: %s Quantity: %d Unit Cost: %.0f\n",
-			nameItem, categorySlice[shopListMap[nameItem].category], shopListMap[nameItem].qty, shopListMap[nameItem].cost)
+			nameItem, categorySlice[shopList[nameItem].category], shopList[nameItem].qty, shopList[nameItem].cost)
 	}
 
 }
 
-func genShoppingReport(shopListMap map[string]shopItem, categorySlice []string) {
+func genShoppingReport(shopList listMap, categorySlice []string) {
 	generateReport := []string{
 		"Generate Report",
 		"1.  Total Cost of each category.",
@@ -44,10 +45,10 @@ func genShoppingReport(shopListMap map[string]shopItem, categorySlice []string) 
 	if choice <= 2 {
 		if choice == 1 {
 			// Total cost of each category
-			genReportByCategory(shopListMap, categorySlice)
+			genReportByCategory(shopList, categorySlice)
 		} else {
 			// list items by cost
-			genReportByCost(shopListMap, categorySlice)
+			genReportByCost(shopList, categorySlice)
 			fmt.Println("")
 		}
 	} else {
@@ -57,13 +58,13 @@ func genShoppingReport(shopListMap map[string]shopItem, categorySlice []string) 
 }
 
 // Total cost of each category
-func genReportByCategory(shopListMap map[string]shopItem, categorySlice []string) {
+func genReportByCategory(shopList listMap, categorySlice []string) {
 
 	// create slice based on the size of the category map
 	categorySumTotal := make([]float64, len(categorySlice))
 
 	// add cost of respective category
-	for _, item := range shopListMap {
+	for _, item := range shopList {
 		categorySumTotal[item.category] += item.cost
 		//		fmt.Println(item)
 	}
@@ -77,12 +78,12 @@ func genReportByCategory(shopListMap map[string]shopItem, categorySlice []string
 }
 
 // list items by cost
-func genReportByCost(shopListMap map[string]shopItem, categorySlice []string) {
+func genReportByCost(shopList listMap, categorySlice []string) {
 
 	// Show all shopping items category, item , qty and unit price
 	// Get all the keys (Item name) of a map of struct into a slice
-	keys := make([]string, 0, len(shopListMap))
-	for k := range shopListMap {
+	keys := make([]string, 0, len(shopList))
+	for k := range shopList {
 		keys = append(keys, k)
 	}
 
@@ -91,7 +92,7 @@ func genReportByCost(shopListMap map[string]shopItem, categorySlice []string) {
 
 	for _, name := range keys {
 		// get particular item
-		item := shopListMap[name]
+		item := shopList[name]
 		tempStr := "Category: " + categorySlice[item.category] + " - Item: " + name + " Quantity: " +
 			strconv.Itoa(item.qty) + " Unit Cost: " + strconv.Itoa(int(item.cost)) + "\n"
 
@@ -106,8 +107,8 @@ func genReportByCost(shopListMap map[string]shopItem, categorySlice []string) {
 	}
 }
 
-// Note map is passed by reference and not by value
-func addItem(shopListMap map[string]shopItem, categorySlice []string) {
+// Note map is passed by value (which is the reference to the map)
+func addItem(shopList listMap, categorySlice sliceString) {
 	var item shopItem
 	var name string
 	var category string
@@ -119,7 +120,7 @@ func addItem(shopListMap map[string]shopItem, categorySlice []string) {
 		fmt.Scanln(&category)
 		if (strings.TrimSpace(category)) != "" {
 			// read status of category against the map
-			ok, key := category_value_present(categorySlice, category)
+			ok, key := categorySlice.category_value_present(category)
 
 			if ok {
 				item.category = key
@@ -128,7 +129,7 @@ func addItem(shopListMap map[string]shopItem, categorySlice []string) {
 				fmt.Println("How much does it cost per unit?")
 				fmt.Scanln(&item.cost)
 				// add a new key to map
-				shopListMap[name] = item
+				shopList[name] = item
 			} else {
 				fmt.Println("Wrong Category Error !")
 			}
@@ -140,7 +141,7 @@ func addItem(shopListMap map[string]shopItem, categorySlice []string) {
 	}
 }
 
-func modifyItem(shopListMap map[string]shopItem, categorySlice []string) {
+func modifyItem(shopList listMap, categorySlice sliceString) {
 	var item1, item2 shopItem
 	var name, nameNew string
 	var category string
@@ -150,12 +151,12 @@ func modifyItem(shopListMap map[string]shopItem, categorySlice []string) {
 	fmt.Scanln(&name)
 	if (strings.TrimSpace(name)) != "" {
 
-		item1 = shopListMap[name] //original item
+		item1 = shopList[name] //original item
 
 		fmt.Printf("Current item name is %s - Category is %s - Quantity is %d - Unit Cost %.0f\n",
 			name, categorySlice[item1.category], item1.qty, item1.cost)
 		// check that only valid name is allowed
-		if x, found := shopListMap[name]; found {
+		if x, found := shopList[name]; found {
 			item1 = x
 
 			// make a copy before modification
@@ -178,7 +179,7 @@ func modifyItem(shopListMap map[string]shopItem, categorySlice []string) {
 				category = categorySlice[item1.category]
 			}
 
-			item2.category = sliceIndex(categorySlice, category) // set up with initial value first
+			item2.category = categorySlice.sliceIndex(category) // set up with initial value first
 			// check valid category
 			if item2.category != -1 {
 
@@ -189,10 +190,10 @@ func modifyItem(shopListMap map[string]shopItem, categorySlice []string) {
 				fmt.Scanln(&item1.cost)
 				// update item to shopList map
 				if name != nameNew {
-					delete(shopListMap, name)    // remove old key
-					shopListMap[nameNew] = item1 // create new key
+					delete(shopList, name)    // remove old key
+					shopList[nameNew] = item1 // create new key
 				} else {
-					shopListMap[name] = item1 // update old key with new values
+					shopList[name] = item1 // update old key with new values
 				}
 
 				// Update change status to each field
@@ -221,7 +222,7 @@ func modifyItem(shopListMap map[string]shopItem, categorySlice []string) {
 	}
 }
 
-func deleteItem(shopListMap map[string]shopItem) {
+func deleteItem(shopList listMap) {
 
 	//	var shop_list shopItem
 	var name string
@@ -232,15 +233,15 @@ func deleteItem(shopListMap map[string]shopItem) {
 	// check for blank name
 	if (strings.TrimSpace(name)) != "" {
 		// check for valid existing name
-		if map_key_present(shopListMap, name) {
+		if shopList.map_key_present(name) {
 			//			fmt.Println("Key is present")
 			//			fmt.Printf(" found= %d\n", x)
 			//			fmt.Scanln()
 
 			// Remove Map x
-			if x < len(shopListMap) {
+			if x < len(shopList) {
 				// delete item in slice with append of particular slice
-				delete(shopListMap, name) // remove old key name
+				delete(shopList, name) // remove old key name
 				fmt.Println("Deleted " + name)
 			} else { // Item does not exist
 				fmt.Println("Item not found.  Nothing to delete")
@@ -253,22 +254,24 @@ func deleteItem(shopListMap map[string]shopItem) {
 	}
 }
 
-func printCurrentField(shopListMap map[string]shopItem) {
+//func printCurrentField(shopListMap map[string]shopItem) {
+func printCurrentField(shopList listMap) {
 	// key all keys in the shopList Map in a slice
-	keys := getAllKeys(shopListMap)
+	//	keys := getAllKeys(shopListMap)
+	keys := shopList.getAllKeys()
 
 	//	fmt.Println(keys)
 
 	fmt.Println("Print Current Data.")
 	// Get data field of each slice and display it
 	for _, k := range keys {
-		fmt.Println(k, "-", shopListMap[k])
+		fmt.Println(k, "-", shopList[k])
 	}
 }
 
 // slice is passed by value which is the pointer to the array
 // Need to pass the pointer to the slice itself if modification to the slice is needed
-func addNewOrModifyCategory(categorySlice *[]string) {
+func addNewOrModifyCategory(categorySlice *sliceString) {
 	var newCategory string
 
 	//	fmt.Println(len(categoryMap), categoryMap)
@@ -277,8 +280,8 @@ func addNewOrModifyCategory(categorySlice *[]string) {
 	fmt.Scanln(&newCategory)
 	if (strings.TrimSpace(newCategory)) != "" {
 		//		fmt.Printf("Length of Map = %d\n", len(categoryMap))
-
-		i := sliceIndex(*categorySlice, newCategory)
+		// indirection to get the data then call the method
+		i := (*categorySlice).sliceIndex(newCategory)
 		if i == -1 {
 			//	New category added to last slice
 			*categorySlice = append(*categorySlice, newCategory)
@@ -316,7 +319,7 @@ func showCategory(categorySlice []string) {
 	fmt.Println(len(categorySlice))
 }
 
-func deleteCategory(shopListMap map[string]shopItem, categorySlice *[]string) {
+func deleteCategory(shopList listMap, categorySlice *sliceString) {
 	var newCategory string
 	// Note when category is deleted
 	// Problem with this operation
@@ -332,7 +335,7 @@ func deleteCategory(shopListMap map[string]shopItem, categorySlice *[]string) {
 	fmt.Scanln(&newCategory)
 	if (strings.TrimSpace(newCategory)) != "" {
 
-		i := sliceIndex(*categorySlice, newCategory)
+		i := (*categorySlice).sliceIndex(newCategory)
 		if i == -1 {
 			fmt.Printf("Category: %s cannot be found\n", newCategory)
 
@@ -340,14 +343,14 @@ func deleteCategory(shopListMap map[string]shopItem, categorySlice *[]string) {
 			if i > 0 {
 				// Step 1.  Before delete is done, need to check if the category is used in shopping list
 				// if it is, deletion is disallowed
-				if map_category_present(shopListMap, i) == false {
+				if shopList.map_category_present(i) == false {
 					// This approach maintains the original order of the slice with one element removed
 					// Note ... variadic argument because the it is variable length element to unpack
 					*categorySlice = append((*categorySlice)[:i], (*categorySlice)[i+1:]...)
 					fmt.Printf("Category: %s delete\n", newCategory)
 					// Step 2.  If deletion is category i is removed, shoplist cat index has to be adjusted
 					// All category > i is reduced by 1 for every item is shopping list
-					shiftDownCategoryBy1(shopListMap, i)
+					shopList.shiftDownCategoryBy1(i)
 				} else {
 					fmt.Println("Category in used, cannot be deleted")
 				}
@@ -362,9 +365,15 @@ func deleteCategory(shopListMap map[string]shopItem, categorySlice *[]string) {
 	fmt.Println(*categorySlice)
 }
 
+// Use Receiver for these functions below
+
+// receiver only accepts named types, so the type of receiver has to be defined first before it can be used
+// type listMap map[string]shopItem
+// type sliceString []string
+
 // return the index given the name of the category
 // return -1 , if index is not found
-func sliceIndex(s []string, strToFind string) int {
+func (s sliceString) sliceIndex(strToFind string) int {
 	for i, v := range s {
 		// end when there is a match, otherwise continue to search till the end
 		if v == strToFind {
@@ -376,14 +385,14 @@ func sliceIndex(s []string, strToFind string) int {
 
 // check if map has this key
 // retrun true if there is
-func map_key_present(m map[string]shopItem, k string) (ok bool) {
+func (m listMap) map_key_present(k string) (ok bool) {
 	_, ok = m[k]
 	return
 }
 
-// check if map has this category in the object
+// check if map has this category in the object m
 // return true is category is present
-func map_category_present(m map[string]shopItem, k int) (ok bool) {
+func (m listMap) map_category_present(k int) (ok bool) {
 	// add cost of respective category
 	for _, item := range m {
 		if (item.category) == k {
@@ -397,7 +406,7 @@ func map_category_present(m map[string]shopItem, k int) (ok bool) {
 // operation on category
 // For all shoplist item with category > categoryKey, category = category -1
 // Note:  Map value cannot be changed directly, it can only be re-created
-func shiftDownCategoryBy1(m map[string]shopItem, categoryKey int) {
+func (m listMap) shiftDownCategoryBy1(categoryKey int) {
 	// add cost of respective category1
 
 	for k, item := range m {
@@ -413,7 +422,7 @@ func shiftDownCategoryBy1(m map[string]shopItem, categoryKey int) {
 }
 
 // check if category slice has this value
-func category_value_present(s []string, v string) (ok bool, index int) {
+func (s sliceString) category_value_present(v string) (ok bool, index int) {
 	// test the values in the map
 	for i, value := range s {
 		// check validity of category name
@@ -430,7 +439,7 @@ func category_value_present(s []string, v string) (ok bool, index int) {
 }
 
 // get all keys of the shopItemMap and return a slice
-func getAllKeys(m map[string]shopItem) (s []string) {
+func (m listMap) getAllKeys() (s []string) {
 	// test the values in the map
 	//s := make([]string, len(m))
 
