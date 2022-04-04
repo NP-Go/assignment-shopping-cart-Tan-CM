@@ -33,6 +33,8 @@ import (
 //          i, e := range slice type  ==> i = index, e = element for both slice or array
 //  5.  append  -- overloaded built-in function, use to build slice of elements of variable size
 //      for slice --> slices = append (slice,e)
+//  6.  Receiver - when using receiver in func, take note that only named Type are accepted, type like
+//      function that use reciever must also use the named type in parameter passing
 //
 //*****************************************
 // What can be improved for this course?
@@ -47,11 +49,15 @@ type shopItem struct {
 	cost     float64
 }
 
+// Needed for receiver because receiver only accept named Type (sliceString) instead of []string
+type listMap map[string]shopItem
+type sliceString []string
+
 func main() {
 	//insert code here
 	// create map reference with dynamic size allocation
 
-	categorySlice := []string{
+	categorySlice := sliceString{
 		// initialise map
 		"Undefined",
 		"Household",
@@ -60,7 +66,7 @@ func main() {
 	}
 
 	// create map reference
-	shopListMap := make(map[string]shopItem)
+	shopListMap := make(listMap)
 	// initialise map
 	shopListMap["Cup"] = shopItem{1, 5, 3}
 	shopListMap["Cake"] = shopItem{2, 3, 1}
